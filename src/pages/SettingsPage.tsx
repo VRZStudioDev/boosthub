@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -82,6 +83,87 @@ function EmailSection() {
   );
 }
 
+function TelegramLinkSection() {
+  const { user } = useAuth();
+  const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const [chatId, setChatId] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const linked = profile?.telegram_chat_id ?? null;
+
+  async function save(value: string | null) {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ telegram_chat_id: value })
+        .eq('id', user.id);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      toast.success(value ? 'Telegram linked.' : 'Telegram unlinked.');
+      setChatId('');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not save. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = chatId.trim();
+    if (!/^-?\d+$/.test(trimmed)) {
+      toast.error('Enter a valid numeric chat ID (from the bot).');
+      return;
+    }
+    await save(trimmed);
+  }
+
+  return (
+    <div className="card">
+      <h2 className="text-lg font-semibold text-white">Link Telegram</h2>
+      <p className="mt-1 text-sm text-slate-400">
+        Connect Telegram to check your subscription status with the support bot.
+      </p>
+
+      <ol className="mt-4 space-y-1.5 text-sm text-slate-400">
+        <li>1. Open the BoostHub bot on Telegram and send <code className="text-accent-cyan">/start</code>.</li>
+        <li>2. Send <code className="text-accent-cyan">/status</code> — the bot replies with your chat ID.</li>
+        <li>3. Paste that ID below and save.</li>
+      </ol>
+
+      {linked ? (
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-300">
+            Linked chat ID: <span className="font-mono text-accent-green">{linked}</span>
+          </p>
+          <Button variant="danger" size="sm" loading={loading} onClick={() => save(null)}>
+            Unlink
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <Input
+            label="Telegram chat ID"
+            name="telegram-chat-id"
+            inputMode="numeric"
+            placeholder="123456789"
+            value={chatId}
+            onChange={(e) => setChatId(e.target.value)}
+            required
+          />
+          <Button type="submit" loading={loading} className="sm:mb-0.5">
+            Save
+          </Button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 function DangerZone() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -139,6 +221,7 @@ export default function SettingsPage() {
         <div className="mx-auto flex max-w-2xl flex-col gap-6">
           <SubscriptionSection />
           <EmailSection />
+          <TelegramLinkSection />
           <DangerZone />
         </div>
       </div>

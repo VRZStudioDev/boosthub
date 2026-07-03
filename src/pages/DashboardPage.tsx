@@ -1,16 +1,13 @@
 import { PageLayout } from '../components/layout/PageLayout';
 import { Button } from '../components/ui/Button';
 import { LicenseBadge, UsageBadge } from '../components/ui/Badge';
-import { CopyField } from '../components/ui/CopyField';
 import { Spinner } from '../components/ui/Spinner';
+import { EarningsCalculator } from '../components/dashboard/EarningsCalculator';
+import { NetworkDiagnostics } from '../components/dashboard/NetworkDiagnostics';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { useUsageLogs } from '../hooks/useUsageLogs';
 import { useBilling } from '../hooks/useBilling';
-
-// Base URL of your automation worker. Override with VITE_WORKER_BASE_URL.
-const WORKER_BASE_URL =
-  import.meta.env.VITE_WORKER_BASE_URL ?? 'https://your-worker.workers.dev';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString(undefined, {
@@ -61,53 +58,13 @@ function LicenseStatusCard() {
       ) : (
         <div className="mt-4">
           <p className="text-sm text-slate-400">
-            Your plan is inactive. Reactivate to keep using voice shortcuts and earnings tracking.
+            Your plan is inactive. Reactivate to keep using earnings tracking and voice automation.
           </p>
           <Button size="sm" className="mt-4" loading={loadingCheckout} onClick={startCheckout}>
             Reactivate Subscription
           </Button>
         </div>
       )}
-    </div>
-  );
-}
-
-function ConfigurationCard() {
-  const { user } = useAuth();
-  const { data: profile } = useProfile();
-
-  const uniqueId = profile?.telegram_user_id || profile?.id || user?.id || '';
-  const shortcutUrl = `${WORKER_BASE_URL}/disparar?usuario=${uniqueId}`;
-
-  const instructions = [
-    'Copy your unique ID below.',
-    'Install an automation app (e.g. Pushcut) and create a new shortcut.',
-    'Set your Siri Shortcut URL to the address below.',
-    'Train Siri to say “Trigger 1” to run your shortcut.',
-  ];
-
-  return (
-    <div className="card">
-      <h2 className="text-lg font-semibold text-white">Configuration</h2>
-      <p className="mt-1 text-sm text-slate-400">
-        Connect your voice shortcut in a couple of minutes.
-      </p>
-
-      <ol className="mt-5 space-y-3">
-        {instructions.map((text, i) => (
-          <li key={text} className="flex gap-3 text-sm text-slate-300">
-            <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-accent-cyan/30 bg-navy-950 text-xs font-bold text-accent-cyan">
-              {i + 1}
-            </span>
-            {text}
-          </li>
-        ))}
-      </ol>
-
-      <div className="mt-6 space-y-5">
-        <CopyField label="Your unique ID" value={uniqueId} />
-        <CopyField label="Siri Shortcut URL" value={shortcutUrl} />
-      </div>
     </div>
   );
 }
@@ -119,7 +76,7 @@ function UsageLogsCard() {
     <div className="card">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Recent activity</h2>
-        <span className="text-xs text-slate-500">Last 10 triggers</span>
+        <span className="text-xs text-slate-500">Last 10 events</span>
       </div>
 
       <div className="mt-4">
@@ -131,7 +88,7 @@ function UsageLogsCard() {
           <div className="rounded-xl border border-dashed border-white/10 py-10 text-center">
             <p className="text-sm text-slate-400">No activity yet.</p>
             <p className="mt-1 text-xs text-slate-500">
-              Your triggers will appear here once you run your shortcut.
+              Your recent BoostHub activity will appear here.
             </p>
           </div>
         ) : (
@@ -174,9 +131,8 @@ export default function DashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <LicenseStatusCard />
-          <div className="lg:row-span-2">
-            <ConfigurationCard />
-          </div>
+          <EarningsCalculator />
+          <NetworkDiagnostics />
           <UsageLogsCard />
         </div>
       </div>

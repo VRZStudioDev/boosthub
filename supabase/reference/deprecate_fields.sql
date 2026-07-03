@@ -1,0 +1,15 @@
+-- ============================================================================
+-- REFERENCE ONLY — do NOT run automatically.
+-- ============================================================================
+-- These columns are deprecated and no longer used by the app's primary flow.
+-- Nothing reads or writes `telegram_user_id` in the frontend anymore.
+--
+-- We intentionally keep the columns in place for now so existing data and any
+-- `select('*')` queries don't break. If/when the client confirms the old data
+-- is no longer needed, they can drop the columns manually:
+--
+--   ALTER TABLE public.profiles DROP COLUMN IF EXISTS telegram_user_id;
+--
+-- Note: `pushcut_url` was never part of the schema, so there is nothing to drop
+-- for it. License gating relies solely on `profiles.license_status = 'active'`.
+-- ============================================================================

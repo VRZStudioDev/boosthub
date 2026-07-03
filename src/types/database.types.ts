@@ -14,7 +14,14 @@ export interface Profile {
   license_status: LicenseStatus;
   stripe_customer_id: string | null;
   subscription_id: string | null;
-  telegram_user_id: string | null;
+  /**
+   * @deprecated No longer used for the primary trigger flow. Kept optional so
+   * existing rows/`select('*')` don't break. Safe to drop from the DB later
+   * (see supabase/reference/deprecate_fields.sql).
+   */
+  telegram_user_id?: string | null;
+  /** Telegram chat_id linked by the user, used by the status/support bot. */
+  telegram_chat_id?: string | null;
   current_period_end: string | null;
   created_at: string;
   updated_at: string;
@@ -34,12 +41,18 @@ export interface Database {
         Row: Profile;
         Insert: Partial<Profile> & Pick<Profile, 'id' | 'email'>;
         Update: Partial<Profile>;
+        Relationships: [];
       };
       usage_logs: {
         Row: UsageLog;
         Insert: Partial<UsageLog> & Pick<UsageLog, 'profile_id'>;
         Update: Partial<UsageLog>;
+        Relationships: [];
       };
     };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
 }

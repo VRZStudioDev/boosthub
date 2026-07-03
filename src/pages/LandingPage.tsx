@@ -8,19 +8,25 @@ import { MONTHLY_PRICE_LABEL } from '../lib/stripe';
 
 const features = [
   {
-    title: 'Hands-Free Siri',
-    description: 'Trigger custom actions using just your voice. Keep your eyes on the road and your hands on the wheel.',
-    icon: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z',
-  },
-  {
-    title: 'Instant Decision Support',
-    description: 'Get real-time cost-per-mile analysis so you know at a glance whether an incoming order is worth your time.',
+    title: 'Cost-Per-Mile Analysis',
+    description:
+      'See what an order truly pays per mile after fuel, so you can spot unprofitable trips before you accept them.',
+    image: 'https://picsum.photos/seed/boosthub-earnings/640/400',
     icon: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z',
   },
   {
-    title: '2-Minute Setup',
-    description: 'Connect your favorite tools and start optimizing. No complicated configuration, no learning curve.',
-    icon: 'M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z',
+    title: 'Network Diagnostics',
+    description:
+      'Check your connection to the BoostHub API and see real-time latency, so you know the app is reachable before your shift.',
+    image: 'https://picsum.photos/seed/boosthub-network/640/400',
+    icon: 'M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z',
+  },
+  {
+    title: 'Voice Automation (Siri)',
+    description:
+      'Trigger your own custom Siri actions — open your favorite apps, send a quick message, or start a timer — all hands-free.',
+    image: 'https://picsum.photos/seed/boosthub-voice/640/400',
+    icon: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z',
   },
 ];
 
@@ -32,13 +38,13 @@ const steps = [
   },
   {
     step: '2',
-    title: 'Connect your shortcut',
-    body: 'Copy your unique ID and paste your shortcut URL into your favorite automation app.',
+    title: 'Set your target rate',
+    body: 'Tell BoostHub your minimum cost-per-mile so it can flag orders worth taking.',
   },
   {
     step: '3',
-    title: 'Say the word',
-    body: 'Train Siri to run your shortcut. From then on, one voice command does the work.',
+    title: 'Drive smarter',
+    body: 'Evaluate orders, run voice shortcuts, and track your activity — all from one dashboard.',
   },
 ];
 
@@ -98,14 +104,25 @@ function FeaturesSection() {
 
       <div className="grid gap-6 md:grid-cols-3">
         {features.map((f) => (
-          <div key={f.title} className="card transition hover:border-accent-cyan/30 hover:shadow-accent-cyan/10">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent-cyan/20 to-accent-green/20 text-accent-cyan">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d={f.icon} />
-              </svg>
+          <div
+            key={f.title}
+            className="card overflow-hidden p-0 transition hover:border-accent-cyan/30 hover:shadow-accent-cyan/10"
+          >
+            <img
+              src={f.image}
+              alt={f.title}
+              loading="lazy"
+              className="h-40 w-full object-cover"
+            />
+            <div className="p-6">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent-cyan/20 to-accent-green/20 text-accent-cyan">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d={f.icon} />
+                </svg>
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-white">{f.title}</h3>
+              <p className="text-sm leading-relaxed text-slate-400">{f.description}</p>
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-white">{f.title}</h3>
-            <p className="text-sm leading-relaxed text-slate-400">{f.description}</p>
           </div>
         ))}
       </div>
