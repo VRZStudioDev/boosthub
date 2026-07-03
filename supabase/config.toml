@@ -1,0 +1,16 @@
+# Supabase project configuration for BoostHub Edge Functions.
+# The webhook must NOT verify a JWT (Stripe calls it directly).
+
+project_id = "boosthub"
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.stripe-checkout]
+verify_jwt = true
+
+[functions.create-portal-session]
+verify_jwt = true
+
+[functions.delete-account]
+verify_jwt = true
