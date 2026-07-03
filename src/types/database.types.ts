@@ -8,7 +8,7 @@
 export type LicenseStatus = 'active' | 'inactive' | 'canceled';
 export type UsageStatus = 'success' | 'failed';
 
-export interface Profile {
+export type Profile = {
   id: string;
   email: string;
   license_status: LicenseStatus;
@@ -25,14 +25,14 @@ export interface Profile {
   current_period_end: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface UsageLog {
+export type UsageLog = {
   id: string;
   profile_id: string;
   triggered_at: string;
   status: UsageStatus;
-}
+};
 
 export interface Database {
   public: {

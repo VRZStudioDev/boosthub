@@ -11,6 +11,7 @@ trigger any device behaviour. It is read-only against Supabase.
 """
 
 import os
+import html
 import logging
 from datetime import datetime
 
@@ -25,6 +26,9 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
 )
+# httpx logs full request URLs at INFO, which include the bot token. Keep it at
+# WARNING so the token is never written to logs / the systemd journal.
+logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -57,18 +61,34 @@ def get_profile_by_chat_id(chat_id: int):
 
 
 HELP_TEXT = (
-    "Eu sou o assistente de suporte do BoostHub.\n\n"
-    "Comandos disponíveis:\n"
-    "/status - Verifique o status da sua assinatura\n"
-    "/ajuda - Exiba esta mensagem novamente\n\n"
-    f"Acesse o Dashboard para gerenciar sua conta: {DASHBOARD_URL}"
+    "I'm the BoostHub assistant.\n\n"
+    "Available commands:\n"
+    "/status - Check your subscription status\n"
+    "/id - Show your Telegram chat_id\n"
+    "/help - Display this message again\n\n"
+    f"Access the Dashboard to manage your account: {DASHBOARD_URL}"
 )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    first_name = user.first_name if user else "motorista"
-    await update.message.reply_text(f"🚀 Olá {first_name}! Bem-vindo ao BoostHub.\n\n{HELP_TEXT}")
+    chat_id = update.effective_chat.id
+    first_name = html.escape(user.first_name) if user and user.first_name else "motorista"
+    await update.message.reply_text(
+        f"🚀 Hello {first_name}! Welcome to the BoostHub.\n\n"
+        f"🆔 Your chat_id is: <code>{chat_id}</code>\n\n"
+        f"{HELP_TEXT}",
+        parse_mode="HTML",
+    )
+
+
+async def id_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    await update.message.reply_text(
+        f"🆔 Your Telegram ID is:\n<code>{chat_id}</code>\n\n"
+        "Copy this number and paste it in the Dashboard (Settings > Link Telegram).",
+        parse_mode="HTML",
+    )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -81,15 +101,15 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not profile:
         await update.message.reply_text(
-            "❌ Você ainda não vinculou sua conta do Telegram ao BoostHub.\n\n"
-            "Acesse o Dashboard em Configurações e cole o seu ID do Telegram.\n"
-            f"Seu chat_id é: `{chat_id}`",
-            parse_mode="Markdown",
+            "❌ You haven't linked your Telegram account to BoostHub yet.\n\n"
+            "Go to the Dashboard in Settings and paste your Telegram ID.\n"
+            f"Your chat_id is: <code>{chat_id}</code>",
+            parse_mode="HTML",
         )
         return
 
     license_status = profile.get("license_status", "inactive")
-    email = profile.get("email", "não informado")
+    email = html.escape(str(profile.get("email", "not provided")))
 
     if license_status == "active":
         end_date = profile.get("current_period_end")
@@ -101,20 +121,20 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except ValueError:
                 end_str = str(end_date)
         msg = (
-            f"✅ Sua assinatura está *ATIVA*"
-            + (f" até {end_str}." if end_str else ".")
+            f"✅ Your subscription is <b>ACTIVE</b>"
+            + (f" until {end_str}." if end_str else ".")
             + f"\n\n📧 Email: {email}"
         )
     else:
         msg = (
-            "❌ Sua assinatura está *INATIVA*.\n\n"
+            "❌ Your subscription is <b>INACTIVE</b>.\n\n"
             f"📧 Email: {email}\n\n"
-            "Renove sua assinatura acessando o Dashboard."
+            "Renew your subscription by accessing the Dashboard."
         )
 
-    keyboard = [[InlineKeyboardButton("📊 Acessar Dashboard", url=DASHBOARD_URL)]]
+    keyboard = [[InlineKeyboardButton("📊 Access Dashboard", url=DASHBOARD_URL)]]
     await update.message.reply_text(
-        msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
+        msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML"
     )
 
 
@@ -123,10 +143,11 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("status", status))
+    application.add_handler(CommandHandler("id", id_command))
     application.add_handler(CommandHandler("ajuda", help_command))
     application.add_handler(CommandHandler("help", help_command))
 
-    logger.info("Bot iniciado...")
+    logger.info("Bot started...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 

@@ -17,4 +17,5 @@ export function getStripe(): Promise<Stripe | null> {
   return stripePromise;
 }
 
-export const MONTHLY_PRICE_LABEL = '$19.99';
+export const MONTHLY_PRICE_LABEL = '$49.99';
+

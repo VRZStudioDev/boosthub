@@ -11,21 +11,21 @@ const features = [
     title: 'Cost-Per-Mile Analysis',
     description:
       'See what an order truly pays per mile after fuel, so you can spot unprofitable trips before you accept them.',
-    image: 'https://picsum.photos/seed/boosthub-earnings/640/400',
+    image: 'https://www.aranca.com/assets/uploads/blogs/gigecoban.png',
     icon: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z',
   },
   {
     title: 'Network Diagnostics',
     description:
       'Check your connection to the BoostHub API and see real-time latency, so you know the app is reachable before your shift.',
-    image: 'https://picsum.photos/seed/boosthub-network/640/400',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStVQZyLAIK5QiJDXOq2l87tZlQD5jAOMCSaa-p3hb2tZzbxndLcH7Y9I8&s=10',
     icon: 'M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z',
   },
   {
     title: 'Voice Automation (Siri)',
     description:
       'Trigger your own custom Siri actions — open your favorite apps, send a quick message, or start a timer — all hands-free.',
-    image: 'https://picsum.photos/seed/boosthub-voice/640/400',
+    image: 'https://www.shaip.com/wp-content/uploads/2022/10/Blog_Applications-of-Voice-Recognition-Technology.jpg',
     icon: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z',
   },
 ];
