@@ -3,11 +3,14 @@ import { Button } from '../components/ui/Button';
 import { LicenseBadge, UsageBadge } from '../components/ui/Badge';
 import { Spinner } from '../components/ui/Spinner';
 import { EarningsCalculator } from '../components/dashboard/EarningsCalculator';
-import { NetworkDiagnostics } from '../components/dashboard/NetworkDiagnostics';
+import { DecisionsStats } from '../components/dashboard/DecisionsStats';
+import { LastVoiceCommandCard } from '../components/dashboard/LastVoiceCommandCard';
+import { LastVoiceAssistantCard } from '../components/dashboard/LastVoiceAssistantCard';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { useUsageLogs } from '../hooks/useUsageLogs';
 import { useBilling } from '../hooks/useBilling';
+import { MONTHLY_PRICE_LABEL } from '../lib/stripe';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString(undefined, {
@@ -36,7 +39,7 @@ function LicenseStatusCard() {
       {isActive ? (
         <div className="mt-4">
           <p className="text-sm text-slate-400">
-            Your subscription is active.
+            Your {MONTHLY_PRICE_LABEL}/month subscription is active.
             {profile?.current_period_end && (
               <>
                 {' '}
@@ -58,10 +61,11 @@ function LicenseStatusCard() {
       ) : (
         <div className="mt-4">
           <p className="text-sm text-slate-400">
-            Your plan is inactive. Reactivate to keep using earnings tracking and voice automation.
+            Your {MONTHLY_PRICE_LABEL}/month plan is inactive. Reactivate to keep using earnings
+            tracking and voice automation.
           </p>
           <Button size="sm" className="mt-4" loading={loadingCheckout} onClick={startCheckout}>
-            Reactivate Subscription
+            Reactivate {MONTHLY_PRICE_LABEL}/month Plan
           </Button>
         </div>
       )}
@@ -132,7 +136,9 @@ export default function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <LicenseStatusCard />
           <EarningsCalculator />
-          <NetworkDiagnostics />
+          <DecisionsStats className="lg:col-start-2" />
+          <LastVoiceCommandCard className="lg:col-start-2" />
+          <LastVoiceAssistantCard />
           <UsageLogsCard />
         </div>
       </div>

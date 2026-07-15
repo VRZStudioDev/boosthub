@@ -14,3 +14,21 @@ verify_jwt = true
 
 [functions.delete-account]
 verify_jwt = true
+
+[functions.telegram-voice-command]
+verify_jwt = false
+
+[functions.analyze-order]
+verify_jwt = false
+
+[functions.voice-token]
+verify_jwt = true
+
+[functions.trial-eligibility]
+verify_jwt = true
+
+[functions.fraud-assess-signup]
+verify_jwt = false
+
+[functions.fraud-review]
+verify_jwt = false

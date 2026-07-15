@@ -28,7 +28,7 @@
   }
 
   .card {
-    @apply rounded-2xl border border-white/10 bg-navy-900/70 p-6 shadow-xl backdrop-blur;
+    @apply rounded-2xl border border-white/10 bg-navy-900/70 p-4 shadow-xl backdrop-blur sm:p-6;
   }
 
   .gradient-text {

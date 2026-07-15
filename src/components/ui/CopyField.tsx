@@ -20,14 +20,14 @@ export function CopyField({ value, label }: { value: string; label?: string }) {
   return (
     <div className="w-full">
       {label && <p className="mb-1.5 text-sm font-medium text-slate-300">{label}</p>}
-      <div className="flex items-stretch gap-2">
-        <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-xl border border-white/10 bg-navy-950/70 px-4 py-3 text-sm text-accent-cyan">
+      <div className="flex flex-col items-stretch gap-2 sm:flex-row">
+        <code className="min-w-0 flex-1 break-all rounded-xl border border-white/10 bg-navy-950/70 px-4 py-3 text-sm text-accent-cyan sm:overflow-x-auto sm:whitespace-nowrap sm:break-normal">
           {value}
         </code>
         <button
           type="button"
           onClick={copy}
-          className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-medium text-slate-200 transition hover:border-accent-cyan/50 hover:bg-white/10"
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-200 transition hover:border-accent-cyan/50 hover:bg-white/10 sm:w-auto"
           aria-label="Copy to clipboard"
         >
           {copied ? (

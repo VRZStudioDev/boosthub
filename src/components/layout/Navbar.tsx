@@ -44,12 +44,7 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/#features" className="text-sm font-medium text-slate-400 transition hover:text-white">
-                Features
-              </Link>
-              <Link to="/#pricing" className="text-sm font-medium text-slate-400 transition hover:text-white">
-                Pricing
-              </Link>
+              
               <ButtonLink to="/login" variant="ghost" size="sm">
                 Log in
               </ButtonLink>

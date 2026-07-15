@@ -26,6 +26,8 @@ export function LicenseBadge({ status }: { status: LicenseStatus }) {
 const usageStyles: Record<UsageStatus, string> = {
   success: 'border-accent-green/40 bg-accent-green/10 text-accent-green',
   failed: 'border-red-500/40 bg-red-500/10 text-red-400',
+  accept: 'border-accent-green/40 bg-accent-green/10 text-accent-green',
+  decline: 'border-amber-400/40 bg-amber-400/10 text-amber-300',
 };
 
 export function UsageBadge({ status }: { status: UsageStatus }) {

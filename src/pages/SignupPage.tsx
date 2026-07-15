@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/feedback/ToastProvider';
 import { MONTHLY_PRICE_LABEL } from '../lib/stripe';
+import { supabase } from '../lib/supabaseClient';
 
 const benefits = [
   'Voice-triggered shortcuts',
@@ -14,26 +15,56 @@ const benefits = [
 ];
 
 export default function SignupPage() {
-  const { user, signInWithMagicLink, signInWithGoogle } = useAuth();
+  const { user, signUpWithPassword, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [accountCreated, setAccountCreated] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) navigate('/dashboard', { replace: true });
   }, [user, navigate]);
 
+  function validateEmail(value: string) {
+    return /\S+@\S+\.\S+/.test(value);
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!validateEmail(normalizedEmail)) {
+      toast.error('Invalid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await signInWithMagicLink(email.trim());
-      setSent(true);
+      const { data: assessment } = await supabase.functions.invoke<{
+        decision?: 'allow' | 'review' | 'block';
+      }>('fraud-assess-signup', { body: { email: normalizedEmail } });
+      if (assessment?.decision === 'review') {
+        toast.info('Your account may require a quick review before trial access. Paid checkout remains available.');
+      }
+      const session = await signUpWithPassword(normalizedEmail, password);
+      setAccountCreated(true);
+      toast.success('Account created! Login to continue.');
+      if (session) {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Could not send the magic link. Try again.');
+      toast.error(err instanceof Error ? err.message : 'Could not create account. Try again.');
     } finally {
       setLoading(false);
     }
@@ -68,18 +99,18 @@ export default function SignupPage() {
               ))}
             </ul>
 
-            {sent ? (
+            {accountCreated ? (
               <div className="mt-8 rounded-xl border border-accent-green/30 bg-accent-green/10 p-5 text-center">
-                <p className="font-semibold text-white">Check your email to log in.</p>
+                <p className="font-semibold text-white">Account created! Login to continue.</p>
                 <p className="mt-1 text-sm text-slate-400">
-                  We sent a confirmation link to <span className="text-accent-cyan">{email}</span>.
+                  If email confirmation is enabled, confirm your inbox and then sign in.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setSent(false)}
+                  onClick={() => setAccountCreated(false)}
                   className="mt-4 text-sm text-slate-400 underline transition hover:text-white"
                 >
-                  Use a different email
+                  Create another account
                 </button>
               </div>
             ) : (
@@ -94,6 +125,28 @@ export default function SignupPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                  />
+                  <Input
+                    label="Password"
+                    type="password"
+                    name="password"
+                    autoComplete="new-password"
+                    placeholder="At least 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                  <Input
+                    label="Confirm password"
+                    type="password"
+                    name="confirm-password"
+                    autoComplete="new-password"
+                    placeholder="Repeat your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
                   />
                   <Button type="submit" fullWidth size="lg" loading={loading}>
                     Create Account

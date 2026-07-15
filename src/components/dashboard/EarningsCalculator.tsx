@@ -1,5 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { useAuth } from '../../context/AuthContext';
+import { useProfile } from '../../hooks/useProfile';
+import { supabase } from '../../lib/supabaseClient';
+import { useToast } from '../feedback/ToastProvider';
 
 function toNumber(value: string): number {
   const n = parseFloat(value);
@@ -38,11 +44,21 @@ function getVerdict(perMile: number, target: number): Verdict {
 }
 
 export function EarningsCalculator() {
+  const { user } = useAuth();
+  const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
+  const toast = useToast();
   const [pay, setPay] = useState('');
   const [miles, setMiles] = useState('');
   const [gasPrice, setGasPrice] = useState('');
   const [mpg, setMpg] = useState('');
   const [target, setTarget] = useState('1.50');
+  const [savingDefaults, setSavingDefaults] = useState(false);
+
+  useEffect(() => {
+    if (profile?.gas_price && !gasPrice) setGasPrice(String(profile.gas_price));
+    if (profile?.mpg && !mpg) setMpg(String(profile.mpg));
+  }, [gasPrice, mpg, profile?.gas_price, profile?.mpg]);
 
   const result = useMemo(() => {
     const payNum = toNumber(pay);
@@ -60,6 +76,31 @@ export function EarningsCalculator() {
 
   const verdict = getVerdict(result.netPerMile || result.grossPerMile, toNumber(target) || 1.5);
   const money = (n: number) => `$${n.toFixed(2)}`;
+
+  async function saveDefaults() {
+    if (!user) return;
+    const nextGasPrice = toNumber(gasPrice);
+    const nextMpg = toNumber(mpg);
+    if (nextGasPrice <= 0 || nextMpg <= 0) {
+      toast.error('Enter a positive gas price and MPG before saving.');
+      return;
+    }
+
+    setSavingDefaults(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ gas_price: nextGasPrice, mpg: nextMpg })
+        .eq('id', user.id);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      toast.success('Analysis defaults saved.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not save defaults.');
+    } finally {
+      setSavingDefaults(false);
+    }
+  }
 
   return (
     <div className="card">
@@ -114,6 +155,8 @@ export function EarningsCalculator() {
         />
       </div>
 
+      
+
       <div className="mt-4">
         <Input
           label="Target ($/mile)"
@@ -127,6 +170,15 @@ export function EarningsCalculator() {
         />
       </div>
 
+    <Button
+        variant="secondary"
+        size="sm"
+        className="mt-4 w-full sm:w-auto"
+        loading={savingDefaults}
+        onClick={saveDefaults}
+      >
+        Save analysis defaults
+      </Button>
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Gross / mi" value={money(result.grossPerMile)} />
         <Stat label="Est. fuel" value={money(result.fuelCost)} />
@@ -134,12 +186,12 @@ export function EarningsCalculator() {
         <Stat label="Net / mi" value={money(result.netPerMile)} highlight />
       </div>
 
-      <div className="mt-5 flex items-center justify-between rounded-xl border border-white/10 bg-navy-950/60 px-4 py-3">
-        <div>
+      <div className="mt-5 flex flex-col gap-3 rounded-xl border border-white/10 bg-navy-950/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <p className={`text-base font-semibold ${verdict.className}`}>{verdict.label}</p>
           <p className="text-xs text-slate-500">{verdict.hint}</p>
         </div>
-        <span className={`text-2xl font-extrabold ${verdict.className}`}>
+        <span className={`text-xl font-extrabold sm:text-2xl ${verdict.className}`}>
           {money(result.netPerMile || result.grossPerMile)}
           <span className="text-sm font-medium text-slate-500">/mi</span>
         </span>

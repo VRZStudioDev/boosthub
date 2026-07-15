@@ -4,14 +4,16 @@ import { ButtonLink } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { useBilling } from '../hooks/useBilling';
 import { Button } from '../components/ui/Button';
+import { LoopingWords } from '../components/ui/LoopingWords';
 import { MONTHLY_PRICE_LABEL } from '../lib/stripe';
+import { RoiCalculatorSection } from '../components/landing/RoiCalculatorSection';
 
 const features = [
   {
     title: 'Cost-Per-Mile Analysis',
     description:
       'See what an order truly pays per mile after fuel, so you can spot unprofitable trips before you accept them.',
-    image: 'https://www.aranca.com/assets/uploads/blogs/gigecoban.png',
+    image: 'https://i.ibb.co/7ty7TxZr/Design-sem-nome-2.jpg',
     icon: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z',
   },
   {
@@ -34,7 +36,7 @@ const steps = [
   {
     step: '1',
     title: 'Create your account',
-    body: 'Sign up in seconds with a magic link — no passwords to remember.',
+    body: 'Sign up in seconds with email and password, then start your setup flow.',
   },
   {
     step: '2',
@@ -63,8 +65,17 @@ function HeroSection() {
         </span>
 
         <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl animate-fade-in-up">
-          Automate Your Workflow.{' '}
-          <span className="gradient-text">Maximize Your Earnings.</span>
+          <span className="block">Automate Your Workflow.</span>
+          <LoopingWords
+            className="mt-2"
+            textClassName="gradient-text"
+            words={[
+              'Maximize Your Earnings.',
+              'Track Mileage in Real Time.',
+              'Evaluate Orders Faster.',
+              'Stay Focused on the Road.',
+            ]}
+          />
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 animate-fade-in-up">
@@ -73,7 +84,7 @@ function HeroSection() {
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-in-up">
-          <ButtonLink to="/signup" size="lg" className="animate-pulse-glow">
+          <ButtonLink to="/signup" size="lg" className="animate-pulse-glow text-slate-800">
             Start Saving Time
           </ButtonLink>
           <Link
@@ -126,13 +137,16 @@ function FeaturesSection() {
           </div>
         ))}
       </div>
+      
     </section>
   );
 }
 
 function HowItWorksSection() {
   return (
+    
     <section className="border-y border-white/5 bg-navy-900/40 py-16">
+      
       <div className="container-page">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Up and running in minutes</h2>
@@ -178,7 +192,10 @@ function PricingSection() {
           <div className="absolute right-0 top-0 rounded-bl-xl bg-gradient-to-r from-accent-cyan to-accent-green px-3 py-1 text-xs font-bold text-navy-950">
             MOST POPULAR
           </div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-accent-cyan">Pro</p>
+          <div className="absolute left-0 top-0 rounded-br-xl border border-amber-300/30 bg-amber-400/15 px-3 py-1 text-xs font-semibold text-amber-200">
+            Launch Price
+          </div>
+          <p className="text-sm mt-4 font-semibold uppercase tracking-wide text-accent-cyan">Pro</p>
           <div className="mt-3 flex items-end gap-1">
             <span className="text-5xl font-extrabold text-white">{MONTHLY_PRICE_LABEL}</span>
             <span className="mb-1.5 text-slate-400">/month</span>
@@ -215,7 +232,13 @@ function PricingSection() {
 
 function CtaSection() {
   return (
-    <section className="container-page py-16">
+    <section className="container-page pb-6">
+      <img
+        src="/motoboy-2.png"
+        alt="How it works"
+        className="mx-auto  w-full max-w-2xl"
+        style={{ height: 'auto' }}
+      />
       <div className="card relative overflow-hidden bg-gradient-to-br from-navy-800 to-navy-900 text-center">
         <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-accent-cyan/20 blur-3xl" />
         <h2 className="relative text-3xl font-bold text-white">Work smarter, not harder.</h2>
@@ -239,6 +262,7 @@ export default function LandingPage() {
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
+      <RoiCalculatorSection />
       <PricingSection />
       <CtaSection />
     </PageLayout>

@@ -82,7 +82,7 @@ export function NetworkDiagnostics() {
         Check your connection to the BoostHub API so you know the app is reachable before your shift.
       </p>
 
-      <div className="mt-5 flex items-center justify-between rounded-xl border border-white/10 bg-navy-950/60 px-4 py-4">
+      <div className="mt-5 flex flex-col gap-3 rounded-xl border border-white/10 bg-navy-950/60 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           {isChecking ? (
             <Spinner className="h-4 w-4 text-slate-400" />
@@ -102,7 +102,7 @@ export function NetworkDiagnostics() {
           </div>
         </div>
 
-        <div className="text-right">
+        <div className="text-left sm:text-right">
           <p className="text-2xl font-extrabold text-white">
             {latency !== null ? latency : '—'}
             <span className="text-sm font-medium text-slate-500"> ms</span>

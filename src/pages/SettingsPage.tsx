@@ -5,11 +5,15 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { GettingStartedCard } from '../components/dashboard/GettingStartedCard';
+import { NetworkDiagnostics } from '../components/dashboard/NetworkDiagnostics';
+import { VoiceAssistantCard } from '../components/dashboard/VoiceAssistantCard';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { useBilling } from '../hooks/useBilling';
 import { useToast } from '../components/feedback/ToastProvider';
 import { supabase } from '../lib/supabaseClient';
+import { MONTHLY_PRICE_LABEL } from '../lib/stripe';
 
 function SubscriptionSection() {
   const { data: profile } = useProfile();
@@ -22,7 +26,7 @@ function SubscriptionSection() {
       <p className="mt-1 text-sm text-slate-400">
         {isActive
           ? 'Manage your plan, payment method, and invoices in the Stripe portal.'
-          : 'Subscribe to unlock voice shortcuts and earnings tracking.'}
+          : `Subscribe to unlock voice shortcuts and earnings tracking for ${MONTHLY_PRICE_LABEL}/month.`}
       </p>
       {isActive ? (
         <Button variant="secondary" className="mt-4" loading={loadingPortal} onClick={openCustomerPortal}>
@@ -30,7 +34,7 @@ function SubscriptionSection() {
         </Button>
       ) : (
         <Button className="mt-4" loading={loadingCheckout} onClick={startCheckout}>
-          Subscribe Now
+          Subscribe Now ({MONTHLY_PRICE_LABEL}/month)
         </Button>
       )}
     </div>
@@ -123,7 +127,7 @@ function TelegramLinkSection() {
   }
 
   return (
-    <div className="card">
+    <div id="telegram-link" className="card scroll-mt-24">
       <h2 className="text-lg font-semibold text-white">Link Telegram</h2>
       <p className="mt-1 text-sm text-slate-400">
         Connect Telegram to check your subscription status with the support bot.
@@ -218,7 +222,24 @@ export default function SettingsPage() {
     <PageLayout>
       <div className="container-page py-10">
         <h1 className="mb-8 text-2xl font-bold text-white sm:text-3xl">Settings</h1>
-        <div className="mx-auto flex max-w-2xl flex-col gap-6">
+
+        <section id="setup-configuration" className="scroll-mt-24">
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold text-white">Setup &amp; Configuration</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Configure onboarding, voice assistant access, and connectivity checks in one place.
+            </p>
+          </div>
+          <div className="flex flex-col gap-6">
+            <GettingStartedCard />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <VoiceAssistantCard />
+              <NetworkDiagnostics />
+            </div>
+          </div>
+        </section>
+
+        <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-6">
           <SubscriptionSection />
           <EmailSection />
           <TelegramLinkSection />
