@@ -123,7 +123,7 @@ Server secrets:
 supabase secrets set \
   ANTIFRAUD_IP_HASH_SALT=<random-long-secret> \
   FRAUD_REVIEW_SECRET=<ops-review-secret> \
-  TRIAL_PERIOD_DAYS=7
+  TRIAL_PERIOD_DAYS=3
 ```
 
 Core tables:

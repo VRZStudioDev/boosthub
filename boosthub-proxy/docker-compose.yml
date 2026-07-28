@@ -1,0 +1,34 @@
+services:
+  mitmproxy:
+    build: .
+    container_name: boosthub-proxy
+    ports:
+      - "8080:8080"
+      - "127.0.0.1:8081:8081"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./scripts:/app/scripts   # <-- ESSENCIAL: monta a pasta com o proxy_handler.py
+    restart: unless-stopped
+    environment:
+      TARGET_HOST: "api-dasher.doordash.com"   # Depois troque por api.doordash.com
+      WEBHOOK_TOKEN: "BoostHub2026Secure"             # Troque por um token forte
+      DECISION_PATH: "/decision"
+      HEALTH_PATH: "/health"
+      PENDING_TIMEOUT_SECONDS: "45"
+      AUDIT_LOG_PATH: "/app/logs/proxy_audit.jsonl"
+      ORDER_PATH_PATTERN: "^/v1/orders/[^/]+/(accept|decline)$"
+      MITMPROXY_SSL_INSECURE: "true"
+    command:
+      - mitmweb
+      - -s
+      - /app/scripts/proxy_handler.py
+      - --listen-host
+      - 0.0.0.0
+      - --listen-port
+      - "8080"
+      - --web-host
+      - 0.0.0.0
+      - --web-port
+      - "8081"
+      - --ssl-insecure

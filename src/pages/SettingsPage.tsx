@@ -230,6 +230,9 @@ export default function SettingsPage() {
               Configure onboarding, voice assistant access, and connectivity checks in one place.
             </p>
           </div>
+          <div className='py-28'>
+
+          </div>
           <div className="flex flex-col gap-6">
             <GettingStartedCard />
             <div className="grid gap-6 lg:grid-cols-2">

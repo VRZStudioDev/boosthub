@@ -37,6 +37,7 @@ export function VoiceAssistantCard({ className = '' }: { className?: string }) {
   "amount": "{{AMOUNT}}",
   "distance": "{{DISTANCE}}"
 }`;
+  const telegramAcceptUrl = `${telegramCommandBaseUrl}?token=${tokenForDisplay}&decision=accept&amount={{AMOUNT}}`;
   const telegramDeclineUrl = `${telegramCommandBaseUrl}?token=${tokenForDisplay}&decision=decline&amount={{AMOUNT}}`;
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export function VoiceAssistantCard({ className = '' }: { className?: string }) {
       </div>
 
       <p className="mt-1 text-sm text-slate-400">
-        Configure Siri with your personal voice token and automate order analysis + decision logging.
+        Configure Siri to analyze an order, speak the reason, ask what you actually did, and log only the confirmed action.
       </p>
 
       <div className="mt-5 space-y-4">
@@ -148,7 +149,8 @@ export function VoiceAssistantCard({ className = '' }: { className?: string }) {
           </p>
           <p className="mt-2 text-sm text-slate-400">
             For validation, run the shortcut with a known amount and distance, then check that Siri reads
-            the returned decision/reason and the Dashboard updates the Last Voice Assistant card.
+            the returned decision/reason. After you confirm Accept or Decline, the Dashboard should update
+            Last Voice Command with the real action you logged.
           </p>
         </div>
 
@@ -164,13 +166,29 @@ export function VoiceAssistantCard({ className = '' }: { className?: string }) {
             <li>Set header to <span className="text-slate-100">Content-Type: application/json</span>.</li>
             <li>Paste the JSON body below and map <span className="text-slate-100">{'{{AMOUNT}}'}</span> and <span className="text-slate-100">{'{{DISTANCE}}'}</span> to Siri variables.</li>
             <li>Add <span className="text-slate-100">Speak Text</span> to read the returned decision out loud.</li>
+            <li>Ask what action you actually took: <span className="text-slate-100">Accept</span>, <span className="text-slate-100">Decline</span>, or <span className="text-slate-100">Skip</span>.</li>
+            <li>Call the Accept or Decline logging URL only after the real action is confirmed.</li>
           </ol>
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-navy-950/60 p-4">
+          <p className="text-sm font-medium text-white">Optional: Manual VPN Toggle</p>
+          <p className="mt-2 text-sm text-slate-400">
+            If you use a network profile app, keep it as a separate manual shortcut. Do not attach it to
+            the BoostHub decision automatically. Run it only when you explicitly choose to toggle your own VPN/profile.
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <CopyField label="Connect" value="shadowrocket://connect" />
+            <CopyField label="Disconnect" value="shadowrocket://disconnect" />
+            <CopyField label="Toggle" value="shadowrocket://toggle" />
+          </div>
         </div>
 
         <CopyField label="Analyze endpoint" value={analyzeUrl} />
         <CopyField label="Method" value="POST" />
         <CopyField label="Header" value={contentTypeHeader} />
         <CopyField label="Body (JSON)" value={analyzeBody} />
+        <CopyField label="Telegram accept URL" value={telegramAcceptUrl} />
         <CopyField label="Telegram decline URL" value={telegramDeclineUrl} />
 
         {!profile?.telegram_chat_id && (

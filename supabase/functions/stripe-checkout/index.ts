@@ -15,7 +15,7 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-const TRIAL_PERIOD_DAYS = Number(Deno.env.get('TRIAL_PERIOD_DAYS') ?? '7');
+const TRIAL_PERIOD_DAYS = Number(Deno.env.get('TRIAL_PERIOD_DAYS') ?? '3');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
