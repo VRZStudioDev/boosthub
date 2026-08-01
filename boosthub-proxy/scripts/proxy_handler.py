@@ -1,245 +1,198 @@
 """
-BoostHub QA MITM proxy handler.
-
-Authorized use only: this handler is scoped to controlled staging tests for
-staging.api.ourapp.com. It holds selected order decision requests until an
-authenticated QA webhook sends an accept/decline decision.
+BoostHub MITM proxy handler v5 - SDUI injector + Excluded generator.
 """
-
-from __future__ import annotations
 
 import json
 import os
 import re
 import threading
-import time
-import uuid
-from collections import deque
-from dataclasses import dataclass
-from typing import Deque, Optional
+import logging
 
-from mitmproxy import ctx, http
+from mitmproxy import http
 
 
-TARGET_HOST = os.getenv("TARGET_HOST", "staging.api.ourapp.com").strip().lower()
-WEBHOOK_TOKEN = os.getenv("WEBHOOK_TOKEN", "TOKEN_AQUI")
-DECISION_PATH = os.getenv("DECISION_PATH", "/decision")
-HEALTH_PATH = os.getenv("HEALTH_PATH", "/health")
-PENDING_TIMEOUT_SECONDS = int(os.getenv("PENDING_TIMEOUT_SECONDS", "45"))
-AUDIT_LOG_PATH = os.getenv("AUDIT_LOG_PATH", "/app/logs/proxy_audit.jsonl")
-
-ORDER_PATH_PATTERN = re.compile(
-    os.getenv("ORDER_PATH_PATTERN", r"^/v1/orders/[^/]+/(accept|decline)$")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
 )
+logger = logging.getLogger("boosthub-proxy")
+logger.info("BoostHub Proxy Handler v5 starting...")
+
+TARGET_HOSTS = [
+    "api-dasher.doordash.com",
+    "dashapi.com",
+    "unified-gateway.doordash.com",
+    "push.dashapi.com",
+    "dynamic-values-edge-service.doordash.com",
+    "iguazu.doordash.com",
+    "otel-mobile.doordash.com",
+    "doordash.mobile.prod.cmtelematics.com",
+]
+
+LOW_BALL_CENTS = int(os.getenv("LOW_BALL_CENTS", "500"))
+GOOD_OFFER_CENTS = int(os.getenv("GOOD_OFFER_CENTS", "800"))
+
+DECLINE_RE = re.compile(r"/(?:assignments|deliveries)/([^/?]+)/decline/?$")
+ACCEPT_RE = re.compile(r"/(?:assignments|deliveries)/([^/?]+)/accept/?$")
+ACCEPT_MODAL_RE = re.compile(r"accept_modal")
+
+push_streams = {}
+push_lock = threading.Lock()
+killed_assignments = set()
+killed_lock = threading.Lock()
+
+ACTIVE_ASSIGNMENTS_RE = re.compile(r"active_assignments")
+ACTIVE_DELIVERIES_RE = re.compile(r"active_deliveries")
 
 
-@dataclass
-class PendingRequest:
-    token: str
-    flow: http.HTTPFlow
-    created_at: float
-    path: str
-    client_ip: str
+def _is_target(host):
+    return any(t in host for t in TARGET_HOSTS)
 
 
-pending_requests: Deque[PendingRequest] = deque()
-pending_lock = threading.Lock()
-audit_lock = threading.Lock()
+def _client_key(flow):
+    addr = flow.client_conn.address
+    return str(addr[0]) + ":" + str(addr[1])
 
 
-def _audit(event: str, **fields: object) -> None:
-    payload = {"event": event, "timestamp": time.time(), **fields}
-    line = json.dumps(payload, sort_keys=True)
-
-    with audit_lock:
-        try:
-            os.makedirs(os.path.dirname(AUDIT_LOG_PATH), exist_ok=True)
-            with open(AUDIT_LOG_PATH, "a", encoding="utf-8") as log_file:
-                log_file.write(line + "\n")
-        except OSError as exc:
-            ctx.log.warn(f"Unable to write audit log: {exc}")
+def _dollar_amount(header_str):
+    try:
+        cleaned = str(header_str).replace("$", "").replace(",", "").strip()
+        return int(float(cleaned) * 100)
+    except Exception:
+        return 0
 
 
-def _json_response(status_code: int, payload: dict) -> http.Response:
-    return http.Response.make(
-        status_code,
-        json.dumps(payload).encode("utf-8"),
-        {"Content-Type": "application/json; charset=utf-8"},
-    )
+def _inject_indicator(data_bytes):
+    try:
+        data = json.loads(data_bytes)
+    except Exception:
+        return data_bytes
+    if not isinstance(data, dict):
+        return data_bytes
+
+    payment = data.get("attributes", {}).get("payment", {})
+    header = payment.get("header", "")
+    amount_cents = _dollar_amount(header)
+    if amount_cents <= 0:
+        return data_bytes
+
+    if amount_cents >= GOOD_OFFER_CENTS:
+        indicator = " \u2705"
+    elif amount_cents >= LOW_BALL_CENTS:
+        indicator = " \U0001f7e1"
+    else:
+        indicator = " \u274c"
+
+    if "attributes" in data and "payment" in data["attributes"]:
+        old = data["attributes"]["payment"]["header"]
+        if indicator not in old:
+            data["attributes"]["payment"]["header"] = old + indicator
+            logger.info("INJECTED: " + old + " -> " + data["attributes"]["payment"]["header"])
+
+    return json.dumps(data).encode("utf-8")
 
 
-def _get_client_ip(flow: http.HTTPFlow) -> str:
-    if flow.client_conn and flow.client_conn.address:
-        return str(flow.client_conn.address[0])
-    return "unknown"
+def _filter_killed_assignments(data_bytes):
+    """Remove killed assignments from arrays so the app doesn't show them as timeout."""
+    try:
+        data = json.loads(data_bytes)
+    except Exception:
+        return data_bytes
+
+    with killed_lock:
+        ids_to_remove = set(killed_assignments)
+
+    if isinstance(data, list):
+        filtered = [item for item in data if str(item.get("id", "") or item.get("assignment_id", "")) not in ids_to_remove]
+        removed = len(data) - len(filtered)
+        if removed > 0:
+            logger.info("FILTERED: removed " + str(removed) + " killed assignments from response")
+            killed_assignments.clear()
+        return json.dumps(filtered).encode("utf-8")
+
+    if isinstance(data, dict):
+        if "assignments" in data:
+            old = data["assignments"]
+            data["assignments"] = [a for a in old if str(a.get("id", "") or a.get("assignment_id", "")) not in ids_to_remove]
+            removed = len(old) - len(data["assignments"])
+            if removed > 0:
+                logger.info("FILTERED: removed " + str(removed) + " assignments from active_assignments")
+                killed_assignments.clear()
+        if "deliveries" in data:
+            old = data["deliveries"]
+            data["deliveries"] = [d for d in old if str(d.get("id", "") or d.get("assignment_id", "")) not in ids_to_remove]
+            removed = len(old) - len(data["deliveries"])
+            if removed > 0:
+                logger.info("FILTERED: removed " + str(removed) + " deliveries from active_deliveries")
+
+    return json.dumps(data).encode("utf-8")
 
 
-def _extract_token(flow: http.HTTPFlow) -> Optional[str]:
-    auth_header = flow.request.headers.get("Authorization", "")
-    if auth_header.startswith("Bearer "):
-        return auth_header.removeprefix("Bearer ").strip()
-    return flow.request.query.get("token")
-
-
-def _is_authorized(flow: http.HTTPFlow) -> bool:
-    configured = WEBHOOK_TOKEN.strip()
-    if not configured or configured == "TOKEN_AQUI":
-        ctx.log.warn("WEBHOOK_TOKEN is still using the placeholder value.")
-    return _extract_token(flow) == configured
-
-
-def _prune_expired_pending() -> None:
-    now = time.time()
-    expired: list[PendingRequest] = []
-
-    with pending_lock:
-        while pending_requests and now - pending_requests[0].created_at > PENDING_TIMEOUT_SECONDS:
-            expired.append(pending_requests.popleft())
-
-    for pending in expired:
-        pending.flow.response = _json_response(
-            504,
-            {
-                "status": "expired",
-                "token": pending.token,
-                "message": "QA hold timed out before a decision was received.",
-            },
-        )
-        pending.flow.resume()
-        ctx.log.warn(f"Expired held request token={pending.token} path={pending.path}")
-        _audit("request_expired", token=pending.token, path=pending.path)
-
-
-class QaOrderInterceptor:
-    def request(self, flow: http.HTTPFlow) -> None:
-        _prune_expired_pending()
-
+class OrderModifier:
+    def request(self, flow):
         host = flow.request.pretty_host.lower()
         path = flow.request.path.split("?", 1)[0]
+        if not _is_target(host):
+            return
+        if ACCEPT_RE.search(path):
+            logger.info("ACCEPT passando")
+            return
+        if DECLINE_RE.search(path):
+            ck = _client_key(flow)
+            aid_match = DECLINE_RE.search(path)
+            aid = aid_match.group(1) if aid_match else ""
+            if aid:
+                with killed_lock:
+                    killed_assignments.add(aid)
+            logger.info("DECLINE: blocking push stream for " + ck + " assignment=" + aid)
+            with push_lock:
+                pushed = push_streams.pop(ck, None)
+            if pushed and not pushed.error:
+                try:
+                    pushed.kill()
+                    logger.info("Push killed")
+                except Exception:
+                    pass
+            flow.kill()
+            return
 
-        if path == HEALTH_PATH:
-            with pending_lock:
-                pending_count = len(pending_requests)
-            flow.response = _json_response(
+    def response(self, flow):
+        if not _is_target(flow.request.pretty_host.lower()):
+            return
+        path = flow.request.path.split("?", 1)[0]
+        if ACCEPT_MODAL_RE.search(path):
+            if flow.response and flow.response.content:
+                flow.response.content = _inject_indicator(flow.response.content)
+        if ACTIVE_ASSIGNMENTS_RE.search(path) or ACTIVE_DELIVERIES_RE.search(path):
+            if flow.response and flow.response.content:
+                flow.response.content = _filter_killed_assignments(flow.response.content)
+
+
+class PushTracker:
+    def request(self, flow):
+        if "push.dashapi.com" in flow.request.pretty_host:
+            ck = _client_key(flow)
+            with push_lock:
+                push_streams[ck] = flow
+
+    def error(self, flow):
+        if "push.dashapi.com" in flow.request.pretty_host:
+            ck = _client_key(flow)
+            with push_lock:
+                push_streams.pop(ck, None)
+
+
+class Health():
+    def request(self, flow):
+        if flow.request.path.split("?", 1)[0] == "/health":
+            with push_lock:
+                n = len(push_streams)
+            flow.response = http.Response.make(
                 200,
-                {
-                    "status": "ok",
-                    "target_host": TARGET_HOST,
-                    "pending_requests": pending_count,
-                },
-            )
-            return
-
-        if path == DECISION_PATH:
-            self._handle_decision(flow)
-            return
-
-        if host != TARGET_HOST:
-            return
-
-        if flow.request.method.upper() != "POST" or not ORDER_PATH_PATTERN.search(path):
-            return
-
-        token = uuid.uuid4().hex
-        pending = PendingRequest(
-            token=token,
-            flow=flow,
-            created_at=time.time(),
-            path=path,
-            client_ip=_get_client_ip(flow),
-        )
-
-        with pending_lock:
-            pending_requests.append(pending)
-            pending_count = len(pending_requests)
-
-        flow.intercept()
-        ctx.log.info(
-            f"QA hold token={token} host={host} path={path} "
-            f"client={pending.client_ip} pending={pending_count}"
-        )
-        _audit(
-            "request_held",
-            token=token,
-            host=host,
-            path=path,
-            client_ip=pending.client_ip,
-            pending_requests=pending_count,
-        )
-
-    def _handle_decision(self, flow: http.HTTPFlow) -> None:
-        if flow.request.method.upper() != "POST":
-            flow.response = _json_response(405, {"error": "method_not_allowed"})
-            return
-
-        if not _is_authorized(flow):
-            flow.response = _json_response(401, {"error": "unauthorized"})
-            return
-
-        try:
-            body = json.loads(flow.request.get_text() or "{}")
-        except json.JSONDecodeError:
-            flow.response = _json_response(400, {"error": "invalid_json"})
-            return
-
-        decision = str(body.get("decision", "")).strip().lower()
-        if decision not in {"accept", "decline"}:
-            flow.response = _json_response(400, {"error": "invalid_decision"})
-            return
-
-        with pending_lock:
-            pending = pending_requests.popleft() if pending_requests else None
-            pending_count = len(pending_requests)
-
-        if pending is None:
-            flow.response = _json_response(404, {"error": "no_pending_request"})
-            ctx.log.warn(f"Decision received without pending request decision={decision}")
-            _audit("decision_without_pending", decision=decision)
-            return
-
-        if decision == "accept":
-            pending.flow.resume()
-            ctx.log.info(
-                f"QA release token={pending.token} decision=accept path={pending.path} "
-                f"remaining={pending_count}"
-            )
-            _audit(
-                "request_released",
-                token=pending.token,
-                decision=decision,
-                path=pending.path,
-                pending_requests=pending_count,
-            )
-        else:
-            pending.flow.response = _json_response(
-                200,
-                {
-                    "status": "declined_by_qa_simulation",
-                    "token": pending.token,
-                },
-            )
-            pending.flow.resume()
-            ctx.log.info(
-                f"QA drop token={pending.token} decision=decline path={pending.path} "
-                f"remaining={pending_count}"
-            )
-            _audit(
-                "request_dropped",
-                token=pending.token,
-                decision=decision,
-                path=pending.path,
-                pending_requests=pending_count,
+                json.dumps({"status":"ok","push_streams":n}).encode(),
+                {"Content-Type":"application/json"},
             )
 
-        flow.response = _json_response(
-            200,
-            {
-                "status": "ok",
-                "decision": decision,
-                "processed_token": pending.token,
-                "pending_requests": pending_count,
-            },
-        )
 
-
-addons = [QaOrderInterceptor()]
+addons = [OrderModifier(), PushTracker(), Health()]
+logger.info("BoostHub Proxy v5 ready: " + str(len(addons)) + " addons")
