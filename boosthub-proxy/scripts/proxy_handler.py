@@ -1,14 +1,17 @@
 """
-BoostHub MITM proxy handler v5 - SDUI injector + Excluded generator.
+BoostHub MITM proxy v7 - SDUI injector + Telegram notification.
+Clean version: no push/offer blocking. Focus on what works.
 """
 
 import json
 import os
 import re
-import threading
 import logging
+import threading
+import time
 
 from mitmproxy import http
+import requests
 
 
 logging.basicConfig(
@@ -16,50 +19,37 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger("boosthub-proxy")
-logger.info("BoostHub Proxy Handler v5 starting...")
+logger.info("BoostHub Proxy v7 starting...")
 
-TARGET_HOSTS = [
-    "api-dasher.doordash.com",
-    "dashapi.com",
-    "unified-gateway.doordash.com",
-    "push.dashapi.com",
-    "dynamic-values-edge-service.doordash.com",
-    "iguazu.doordash.com",
-    "otel-mobile.doordash.com",
-    "doordash.mobile.prod.cmtelematics.com",
-]
+# ── Config ───────────────────────────────────────────────────────────────────
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8792459063:AAE7mimGKw0tv2c68kMhx9Hjd9yN5VIrMjo")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "8656593306")
 
 LOW_BALL_CENTS = int(os.getenv("LOW_BALL_CENTS", "500"))
 GOOD_OFFER_CENTS = int(os.getenv("GOOD_OFFER_CENTS", "800"))
 
-DECLINE_RE = re.compile(r"/(?:assignments|deliveries)/([^/?]+)/decline/?$")
-ACCEPT_RE = re.compile(r"/(?:assignments|deliveries)/([^/?]+)/accept/?$")
 ACCEPT_MODAL_RE = re.compile(r"accept_modal")
 
-push_streams = {}
-push_lock = threading.Lock()
-killed_assignments = set()
-killed_lock = threading.Lock()
+TARGET_HOST = "api-dasher.doordash.com"
 
-ACTIVE_ASSIGNMENTS_RE = re.compile(r"active_assignments")
-ACTIVE_DELIVERIES_RE = re.compile(r"active_deliveries")
+unblock_until = 0.0
+unblock_lock = threading.Lock()
+tg_last_update = 0
 
 
-def _is_target(host):
-    return any(t in host for t in TARGET_HOSTS)
+# ── Helpers ──────────────────────────────────────────────────────────────────
 
-
-def _client_key(flow):
-    addr = flow.client_conn.address
-    return str(addr[0]) + ":" + str(addr[1])
-
-
-def _dollar_amount(header_str):
+def _dollar_amount(s):
     try:
-        cleaned = str(header_str).replace("$", "").replace(",", "").strip()
-        return int(float(cleaned) * 100)
+        return int(float(str(s).replace("$", "").replace(",", "").strip()) * 100)
     except Exception:
         return 0
+
+
+def _escape(text):
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def _inject_indicator(data_bytes):
@@ -72,13 +62,13 @@ def _inject_indicator(data_bytes):
 
     payment = data.get("attributes", {}).get("payment", {})
     header = payment.get("header", "")
-    amount_cents = _dollar_amount(header)
-    if amount_cents <= 0:
+    amt = _dollar_amount(header)
+    if amt <= 0:
         return data_bytes
 
-    if amount_cents >= GOOD_OFFER_CENTS:
+    if amt >= GOOD_OFFER_CENTS:
         indicator = " \u2705"
-    elif amount_cents >= LOW_BALL_CENTS:
+    elif amt >= LOW_BALL_CENTS:
         indicator = " \U0001f7e1"
     else:
         indicator = " \u274c"
@@ -92,107 +82,222 @@ def _inject_indicator(data_bytes):
     return json.dumps(data).encode("utf-8")
 
 
-def _filter_killed_assignments(data_bytes):
-    """Remove killed assignments from arrays so the app doesn't show them as timeout."""
+def _send_telegram(amount_cents, pickup_addr, dropoff_addr, distance, deadline, aid):
+    if not TELEGRAM_BOT_TOKEN:
+        return
+
+    d = amount_cents / 100.0
+    if amount_cents >= GOOD_OFFER_CENTS:
+        emoji = "\u2705"
+    elif amount_cents >= LOW_BALL_CENTS:
+        emoji = "\U0001f7e1"
+    else:
+        emoji = "\u274c"
+
+    pickup = _escape(pickup_addr)
+    dropoff = _escape(dropoff_addr)
+    dist = _escape(distance)
+    when = _escape(deadline).replace("Deliver by ", "")
+
+    lines = [
+        "%s <b>Nova Oferta!</b>" % emoji,
+        "\U0001f3ea <b>Pickup:</b> " + pickup,
+        "\U0001f4b0 <b>Valor:</b> $%.2f" % d,
+    ]
+    if dist and dist != "N/D":
+        lines.append("\U0001f4cf <b>Dist\u00e2ncia:</b> " + dist)
+    if when and when != "N/D":
+        lines.append("\U0001f552 <b>Entrega at\u00e9:</b> " + when)
+    if dropoff and dropoff != "N/D":
+        lines.append("\U0001f4cd <b>Cliente:</b> " + dropoff)
+
+    text = "\n".join(lines)
+
+    markup = json.dumps({
+        "inline_keyboard": [[
+            {"text": "\u2705 Aceitar", "callback_data": "accept:" + aid},
+            {"text": "\u274c Recusar", "callback_data": "decline:" + aid},
+        ]]
+    })
+
     try:
-        data = json.loads(data_bytes)
-    except Exception:
-        return data_bytes
+        r = requests.post(
+            "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode":"HTML", "reply_markup": markup},
+            timeout=10,
+        )
+        if r.status_code == 200:
+            logger.info("Telegram sent: $" + str(d) + " " + dist)
+    except Exception as e:
+        logger.info("TG send error: " + str(e))
 
-    with killed_lock:
-        ids_to_remove = set(killed_assignments)
 
-    if isinstance(data, list):
-        filtered = [item for item in data if str(item.get("id", "") or item.get("assignment_id", "")) not in ids_to_remove]
-        removed = len(data) - len(filtered)
-        if removed > 0:
-            logger.info("FILTERED: removed " + str(removed) + " killed assignments from response")
-            killed_assignments.clear()
-        return json.dumps(filtered).encode("utf-8")
+# ── Telegram polling thread ─────────────────────────────────────────────────
 
-    if isinstance(data, dict):
-        if "assignments" in data:
-            old = data["assignments"]
-            data["assignments"] = [a for a in old if str(a.get("id", "") or a.get("assignment_id", "")) not in ids_to_remove]
-            removed = len(old) - len(data["assignments"])
-            if removed > 0:
-                logger.info("FILTERED: removed " + str(removed) + " assignments from active_assignments")
-                killed_assignments.clear()
-        if "deliveries" in data:
-            old = data["deliveries"]
-            data["deliveries"] = [d for d in old if str(d.get("id", "") or d.get("assignment_id", "")) not in ids_to_remove]
-            removed = len(old) - len(data["deliveries"])
-            if removed > 0:
-                logger.info("FILTERED: removed " + str(removed) + " deliveries from active_deliveries")
+def _tg_poll():
+    global tg_last_update
+    if not TELEGRAM_BOT_TOKEN:
+        return
+    while True:
+        try:
+            r = requests.get(
+                "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/getUpdates",
+                params={"offset": tg_last_update + 1, "timeout": 5},
+                timeout=30,
+            )
+            if r.status_code == 200:
+                for u in r.json().get("result", []):
+                    tg_last_update = u["update_id"]
+                    cb = u.get("callback_query")
+                    if cb:
+                        data = cb.get("data", "")
+                        logger.info("TG callback: " + data)
+                        if data.startswith("accept:"):
+                            aid = data.split(":", 1)[1]
+                            with unblock_lock:
+                                unblock_until = time.time() + 10
+                            logger.info("Accept clicked – unlocked for 10s")
+                            requests.post(
+                                "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/answerCallbackQuery",
+                                json={"callback_query_id": cb["id"], "text": "Aceito! Abra o app."},
+                                timeout=10,
+                            )
+                        elif data.startswith("decline:"):
+                            requests.post(
+                                "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/answerCallbackQuery",
+                                json={"callback_query_id": cb["id"], "text": "Recusado."},
+                                timeout=10,
+                            )
+        except Exception:
+            pass
+        time.sleep(1)
 
-    return json.dumps(data).encode("utf-8")
 
+# ── Addon: Order Modifier ──────────────────────────────────────────
 
 class OrderModifier:
     def request(self, flow):
-        host = flow.request.pretty_host.lower()
+        if TARGET_HOST not in flow.request.pretty_host.lower():
+            return
         path = flow.request.path.split("?", 1)[0]
-        if not _is_target(host):
-            return
-        if ACCEPT_RE.search(path):
-            logger.info("ACCEPT passando")
-            return
-        if DECLINE_RE.search(path):
-            ck = _client_key(flow)
-            aid_match = DECLINE_RE.search(path)
-            aid = aid_match.group(1) if aid_match else ""
-            if aid:
-                with killed_lock:
-                    killed_assignments.add(aid)
-            logger.info("DECLINE: blocking push stream for " + ck + " assignment=" + aid)
-            with push_lock:
-                pushed = push_streams.pop(ck, None)
-            if pushed and not pushed.error:
-                try:
-                    pushed.kill()
-                    logger.info("Push killed")
-                except Exception:
-                    pass
-            flow.kill()
-            return
+        if "/accept" in path or "/decline" in path:
+            if "accept" in path.lower():
+                logger.info("ACCEPT passando")
 
     def response(self, flow):
-        if not _is_target(flow.request.pretty_host.lower()):
+        if TARGET_HOST not in flow.request.pretty_host.lower():
             return
-        path = flow.request.path.split("?", 1)[0]
-        if ACCEPT_MODAL_RE.search(path):
+        if ACCEPT_MODAL_RE.search(flow.request.path.split("?", 1)[0]):
             if flow.response and flow.response.content:
-                flow.response.content = _inject_indicator(flow.response.content)
-        if ACTIVE_ASSIGNMENTS_RE.search(path) or ACTIVE_DELIVERIES_RE.search(path):
-            if flow.response and flow.response.content:
-                flow.response.content = _filter_killed_assignments(flow.response.content)
+                try:
+                    data = json.loads(flow.response.content)
+                except Exception:
+                    return
+                if not isinstance(data, dict):
+                    return
+
+                modified = _inject_indicator(json.dumps(data).encode("utf-8"))
+                flow.response.content = modified
+
+                attrs = data.get("attributes", {})
+                payment = attrs.get("payment", {})
+                header = payment.get("header", "")
+                amt = _dollar_amount(header)
+
+                effort = attrs.get("effort", {})
+                estimates = effort.get("estimates", [])
+                distance = ""
+                t = ""
+                for est in estimates:
+                    if "mi" in str(est) or "km" in str(est):
+                        distance = str(est)
+                    elif "Deliver" in str(est) or "PM" in str(est) or "AM" in str(est):
+                        t = str(est)
+
+                route = attrs.get("route", {})
+                waypoints = route.get("waypoints", [])
+                pickup = waypoints[0].get("hover_label", "N/D") if len(waypoints) > 0 else "N/D"
+                dropoff = waypoints[1].get("hover_label", "N/D") if len(waypoints) > 1 else "N/D"
+
+                aid = data.get("assignment_id", "")
+
+                _send_telegram(amt, pickup, dropoff, distance, t, aid)
+
+                # Store last offer for iOS app polling
+                global last_offer_json
+                last_offer_json = {
+                    "assignment_id": aid,
+                    "store_name": pickup,
+                    "store_address": "",
+                    "amount": amt / 100.0,
+                    "tip": 0.0,
+                    "base_pay": amt / 100.0,
+                    "distance_miles": float(str(distance).replace(" mi", "").replace(" km", "")) if distance else 0.0,
+                    "deadline": int(time.time()) + 35,
+                    "pickup_instructions": "",
+                    "dropoff_instructions": dropoff if dropoff != "N/D" else "",
+                    "customer_name": "",
+                    "customer_address": dropoff if dropoff != "N/D" else "",
+                    "items": [],
+                    "is_stack": False,
+                    "captured_at": time.time(),
+                    "raw": header
+                }
 
 
-class PushTracker:
-    def request(self, flow):
-        if "push.dashapi.com" in flow.request.pretty_host:
-            ck = _client_key(flow)
-            with push_lock:
-                push_streams[ck] = flow
-
-    def error(self, flow):
-        if "push.dashapi.com" in flow.request.pretty_host:
-            ck = _client_key(flow)
-            with push_lock:
-                push_streams.pop(ck, None)
-
+# ── Health + Addons ──────────────────────────────────────────────────────────
 
 class Health():
     def request(self, flow):
         if flow.request.path.split("?", 1)[0] == "/health":
-            with push_lock:
-                n = len(push_streams)
             flow.response = http.Response.make(
                 200,
-                json.dumps({"status":"ok","push_streams":n}).encode(),
+                json.dumps({"status":"ok","version":"v7"}).encode(),
                 {"Content-Type":"application/json"},
             )
 
 
-addons = [OrderModifier(), PushTracker(), Health()]
-logger.info("BoostHub Proxy v5 ready: " + str(len(addons)) + " addons")
+addons = [OrderModifier(), Health()]
+
+# ── HTTP endpoint for iOS app ────────────────────────────────────────────
+import http.server
+import socketserver
+
+last_offer_json: dict = {}
+
+
+class OfferHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/offer":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(last_offer_json).encode())
+        elif self.path == "/health":
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"ok")
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+    def log_message(self, format, *args):
+        pass
+
+
+def _start_http():
+    try:
+        server = socketserver.TCPServer(("0.0.0.0", 8080), OfferHandler)
+        logger.info("Offer HTTP endpoint on port 8080")
+        server.serve_forever()
+    except Exception as e:
+        logger.error(f"HTTP server failed: {e}")
+
+
+threading.Thread(target=_start_http, daemon=True).start()
+
+# Start telegram polling
+if TELEGRAM_BOT_TOKEN:
+    threading.Thread(target=_tg_poll, daemon=True).start()
+    logger.info("v7 ready – 2 addons")

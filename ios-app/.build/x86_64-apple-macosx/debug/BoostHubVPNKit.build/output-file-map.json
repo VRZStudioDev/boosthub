@@ -1,0 +1,33 @@
+{
+  "": {
+    "swift-dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/master.swiftdeps"
+  },
+  "/Users/macbook/Desktop/BoostHub/ios-app/BoostHubVPN/BoostHubVPNApp.swift": {
+    "dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/BoostHubVPNApp.d",
+    "object": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/BoostHubVPNApp.swift.o",
+    "swiftmodule": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/BoostHubVPNApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/BoostHubVPNApp.swiftdeps",
+    "diagnostics": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/BoostHubVPNApp.dia"
+  },
+  "/Users/macbook/Desktop/BoostHub/ios-app/BoostHubVPN/OfferModel.swift": {
+    "dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferModel.d",
+    "object": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferModel.swift.o",
+    "swiftmodule": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferModel.swiftdeps",
+    "diagnostics": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferModel.dia"
+  },
+  "/Users/macbook/Desktop/BoostHub/ios-app/BoostHubVPN/OfferOverlay.swift": {
+    "dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferOverlay.d",
+    "object": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferOverlay.swift.o",
+    "swiftmodule": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferOverlay~partial.swiftmodule",
+    "swift-dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferOverlay.swiftdeps",
+    "diagnostics": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/OfferOverlay.dia"
+  },
+  "/Users/macbook/Desktop/BoostHub/ios-app/BoostHubVPN/VPNLiberTunnelProvider.swift": {
+    "dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/VPNLiberTunnelProvider.d",
+    "object": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/VPNLiberTunnelProvider.swift.o",
+    "swiftmodule": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/VPNLiberTunnelProvider~partial.swiftmodule",
+    "swift-dependencies": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/VPNLiberTunnelProvider.swiftdeps",
+    "diagnostics": "/Users/macbook/Desktop/BoostHub/ios-app/.build/x86_64-apple-macosx/debug/BoostHubVPNKit.build/VPNLiberTunnelProvider.dia"
+  }
+}

@@ -1,0 +1,540 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		21CE4920666F8085D473EDD4 /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D2F9D4C1CE9B6BBC25A87E /* DiagnosticsView.swift */; };
+		33DC9C59E4A5641C877C2755 /* VPNLiberTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55CF8DF299A4642B42025612 /* VPNLiberTunnelProvider.swift */; };
+		4717358F75F1548E482D40D6 /* Boost.lottie in Resources */ = {isa = PBXBuildFile; fileRef = 981B4049B9BFF63F353959A5 /* Boost.lottie */; };
+		4E30035DA556A6EB25C73B0A /* BoostHubTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A1A2CF0EAACAE934A2F3BAE7 /* BoostHubTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		50ED587232DD2F3FF1635099 /* SupabaseAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46F3379832A58649706AE42 /* SupabaseAuthManager.swift */; };
+		51E7DAEE6916457730E54215 /* BoostHubVPNApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C640CF558A88E41EE56429DC /* BoostHubVPNApp.swift */; };
+		5DBC4B107B8906B1216C8B66 /* OfferOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1DA005B4724F0FC71E9752D /* OfferOverlay.swift */; };
+		794709999BF542400AAEFB4A /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9B7DFFAEE7CE02C28269C0 /* LoginView.swift */; };
+		8543646A7E4E12DEEC8D6240 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D960809C582A9253DA4FAD59 /* Lottie */; };
+		8D8D87DF25D932D65370E04B /* OfferModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB4CE428B886F3F62F5620F /* OfferModel.swift */; };
+		C58D7954B933AAA057E5EE81 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 240F725947F5202154E465A4 /* ZIPFoundation */; };
+		CA1DAC4FF8EBCDD2732DDF5A /* OfferModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB4CE428B886F3F62F5620F /* OfferModel.swift */; };
+		DAB32AABD193E89399AD6800 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3D80E510E3B541E1672A98 /* SignUpView.swift */; };
+		E2AFFEC8F7BB9BA56C298FF9 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036D2476FCA5A62995B3C5E3 /* ProfileView.swift */; };
+		EB0304F870C018F3E4526CA9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86CFFF2BC19DA045255DF629 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6665E03871FA9A02253E0439 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F333B62F6060212EA25035 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0F63B33076E2409702AB0DB6;
+			remoteInfo = BoostHubTunnel;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C3FDDF74F2E9E05BFD5E3C66 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4E30035DA556A6EB25C73B0A /* BoostHubTunnel.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		036D2476FCA5A62995B3C5E3 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		55CF8DF299A4642B42025612 /* VPNLiberTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLiberTunnelProvider.swift; sourceTree = "<group>"; };
+		74D2F9D4C1CE9B6BBC25A87E /* DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsView.swift; sourceTree = "<group>"; };
+		7D3D80E510E3B541E1672A98 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		7D9B7DFFAEE7CE02C28269C0 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		86CFFF2BC19DA045255DF629 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		981B4049B9BFF63F353959A5 /* Boost.lottie */ = {isa = PBXFileReference; path = Boost.lottie; sourceTree = "<group>"; };
+		A1A2CF0EAACAE934A2F3BAE7 /* BoostHubTunnel.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = BoostHubTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AFB4CE428B886F3F62F5620F /* OfferModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferModel.swift; sourceTree = "<group>"; };
+		C640CF558A88E41EE56429DC /* BoostHubVPNApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostHubVPNApp.swift; sourceTree = "<group>"; };
+		D1DA005B4724F0FC71E9752D /* OfferOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferOverlay.swift; sourceTree = "<group>"; };
+		F46F3379832A58649706AE42 /* SupabaseAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseAuthManager.swift; sourceTree = "<group>"; };
+		F9DFBAF8B600F9E661B62DBF /* BoostHubVPN.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BoostHubVPN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7FDAF4074C893AA0A34FBF5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8543646A7E4E12DEEC8D6240 /* Lottie in Frameworks */,
+				C58D7954B933AAA057E5EE81 /* ZIPFoundation in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0C6A3137340379615321E27D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1A2CF0EAACAE934A2F3BAE7 /* BoostHubTunnel.appex */,
+				F9DFBAF8B600F9E661B62DBF /* BoostHubVPN.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		92DFC4A56A65B94B27C8B4E0 /* BoostHubVPN */ = {
+			isa = PBXGroup;
+			children = (
+				86CFFF2BC19DA045255DF629 /* Assets.xcassets */,
+				C640CF558A88E41EE56429DC /* BoostHubVPNApp.swift */,
+				AFB4CE428B886F3F62F5620F /* OfferModel.swift */,
+				D1DA005B4724F0FC71E9752D /* OfferOverlay.swift */,
+				55CF8DF299A4642B42025612 /* VPNLiberTunnelProvider.swift */,
+				B0DF8E27C6BDD24558896824 /* Auth */,
+				E200B63D8E05876727DE2229 /* Views */,
+			);
+			path = BoostHubVPN;
+			sourceTree = "<group>";
+		};
+		AD59C04E9613C6F410105B95 = {
+			isa = PBXGroup;
+			children = (
+				92DFC4A56A65B94B27C8B4E0 /* BoostHubVPN */,
+				D7B4B3822651D081C9359D3A /* public */,
+				0C6A3137340379615321E27D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B0DF8E27C6BDD24558896824 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				F46F3379832A58649706AE42 /* SupabaseAuthManager.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		D7B4B3822651D081C9359D3A /* public */ = {
+			isa = PBXGroup;
+			children = (
+				981B4049B9BFF63F353959A5 /* Boost.lottie */,
+			);
+			name = public;
+			path = ../public;
+			sourceTree = "<group>";
+		};
+		E200B63D8E05876727DE2229 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				74D2F9D4C1CE9B6BBC25A87E /* DiagnosticsView.swift */,
+				7D9B7DFFAEE7CE02C28269C0 /* LoginView.swift */,
+				036D2476FCA5A62995B3C5E3 /* ProfileView.swift */,
+				7D3D80E510E3B541E1672A98 /* SignUpView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0F63B33076E2409702AB0DB6 /* BoostHubTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 324D90C2D264167A129A56AC /* Build configuration list for PBXNativeTarget "BoostHubTunnel" */;
+			buildPhases = (
+				5A461E0C88E6C59EA23CF6BB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BoostHubTunnel;
+			packageProductDependencies = (
+			);
+			productName = BoostHubTunnel;
+			productReference = A1A2CF0EAACAE934A2F3BAE7 /* BoostHubTunnel.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		15829EDAD51EE37A00B35446 /* BoostHubVPN */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D2689F144984A4E57260527 /* Build configuration list for PBXNativeTarget "BoostHubVPN" */;
+			buildPhases = (
+				FFC98581E2949F18FC8C8FAE /* Sources */,
+				9CF20346B7810A1C27C98470 /* Resources */,
+				7FDAF4074C893AA0A34FBF5A /* Frameworks */,
+				C3FDDF74F2E9E05BFD5E3C66 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A479741449579AB844EC323F /* PBXTargetDependency */,
+			);
+			name = BoostHubVPN;
+			packageProductDependencies = (
+				D960809C582A9253DA4FAD59 /* Lottie */,
+				240F725947F5202154E465A4 /* ZIPFoundation */,
+			);
+			productName = BoostHubVPN;
+			productReference = F9DFBAF8B600F9E661B62DBF /* BoostHubVPN.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		65F333B62F6060212EA25035 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					0F63B33076E2409702AB0DB6 = {
+						DevelopmentTeam = 29U8L34KC9;
+						ProvisioningStyle = Automatic;
+					};
+					15829EDAD51EE37A00B35446 = {
+						DevelopmentTeam = 29U8L34KC9;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = E870285B7FCFF638E749067E /* Build configuration list for PBXProject "BoostHubVPN" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = AD59C04E9613C6F410105B95;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EA57DFD836202FC3E8079B10 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				54739166652F14DEF47B7E08 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0C6A3137340379615321E27D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				15829EDAD51EE37A00B35446 /* BoostHubVPN */,
+				0F63B33076E2409702AB0DB6 /* BoostHubTunnel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9CF20346B7810A1C27C98470 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB0304F870C018F3E4526CA9 /* Assets.xcassets in Resources */,
+				4717358F75F1548E482D40D6 /* Boost.lottie in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5A461E0C88E6C59EA23CF6BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA1DAC4FF8EBCDD2732DDF5A /* OfferModel.swift in Sources */,
+				33DC9C59E4A5641C877C2755 /* VPNLiberTunnelProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFC98581E2949F18FC8C8FAE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				51E7DAEE6916457730E54215 /* BoostHubVPNApp.swift in Sources */,
+				21CE4920666F8085D473EDD4 /* DiagnosticsView.swift in Sources */,
+				794709999BF542400AAEFB4A /* LoginView.swift in Sources */,
+				8D8D87DF25D932D65370E04B /* OfferModel.swift in Sources */,
+				5DBC4B107B8906B1216C8B66 /* OfferOverlay.swift in Sources */,
+				E2AFFEC8F7BB9BA56C298FF9 /* ProfileView.swift in Sources */,
+				DAB32AABD193E89399AD6800 /* SignUpView.swift in Sources */,
+				50ED587232DD2F3FF1635099 /* SupabaseAuthManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A479741449579AB844EC323F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0F63B33076E2409702AB0DB6 /* BoostHubTunnel */;
+			targetProxy = 6665E03871FA9A02253E0439 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		343295F61E453C545AB36043 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 29U8L34KC9;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		6F075381376C955600E349E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BoostHubVPN/App/BoostHubVPN.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = BoostHubVPN/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boosthub.vpn;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		794163BDB5025849660E9C77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BoostHubVPN/Tunnel/BoostHubTunnel.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = BoostHubVPN/Tunnel/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boosthub.vpn.packet-tunnel";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		823C4FED899F89482CA7AF31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 29U8L34KC9;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B624B5916CC76C4DD2DAC94C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BoostHubVPN/App/BoostHubVPN.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = BoostHubVPN/App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.boosthub.vpn;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D25DF2DDBAA0221FCBAA59AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BoostHubVPN/Tunnel/BoostHubTunnel.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = BoostHubVPN/Tunnel/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boosthub.vpn.packet-tunnel";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D2689F144984A4E57260527 /* Build configuration list for PBXNativeTarget "BoostHubVPN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6F075381376C955600E349E8 /* Debug */,
+				B624B5916CC76C4DD2DAC94C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		324D90C2D264167A129A56AC /* Build configuration list for PBXNativeTarget "BoostHubTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				794163BDB5025849660E9C77 /* Debug */,
+				D25DF2DDBAA0221FCBAA59AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E870285B7FCFF638E749067E /* Build configuration list for PBXProject "BoostHubVPN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				823C4FED899F89482CA7AF31 /* Debug */,
+				343295F61E453C545AB36043 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		54739166652F14DEF47B7E08 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+		EA57DFD836202FC3E8079B10 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		240F725947F5202154E465A4 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 54739166652F14DEF47B7E08 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		D960809C582A9253DA4FAD59 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EA57DFD836202FC3E8079B10 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 65F333B62F6060212EA25035 /* Project object */;
+}
